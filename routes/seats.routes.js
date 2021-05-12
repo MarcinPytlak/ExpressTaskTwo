@@ -4,24 +4,24 @@ const db = require('./../db');
 
 router.route('/seats').get((req, res) => {
     let array = db.seats;
-    res.json({array});
+    res.json(array);
   });
 
   router.route('/seats/random').get((req, res) => {
     const randomValue = db.seats[Math.floor(Math.random() * db.seats.length)];
-    res.json({randomValue});
+    res.json(randomValue);
   });
 
   router.route('/seats/:id').get((req, res) => {
     const id = req.params.id;
     const value = db.seats.find(x => x.id == id);
-    res.json({value});
+    res.json(value);
   });
 
   router.route('/seats').post((req, res) => {
     let randomId = db.seats.length + 1;
-    const { author, text } = req.body;
-    if(author, text){
+    const { id, author, text } = req.body;
+    if(author, text && db.seats.some(id)){
          const obj = {
             id: randomId,
             author: req.body.author,

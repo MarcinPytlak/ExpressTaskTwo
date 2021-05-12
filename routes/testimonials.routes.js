@@ -4,18 +4,18 @@ const db = require('./../db');
 
 router.route('/testimonials').get((req, res) => {
     let array = db.testimonials;
-    res.json({array});
+    res.json(array);
   });
 
   router.route('/testimonials/random').get((req, res) => {
     const randomValue = db.testimonials[Math.floor(Math.random() * db.testimonials.length)];
-    res.json({randomValue});
+    res.json(randomValue);
   });
 
   router.route('/testimonials/:id').get((req, res) => {
     const id = req.params.id;
     const value = db.testimonials.find(x => x.id == id);
-    res.json({value});
+    res.json(value);
   });
 
   router.route('/testimonials').post((req, res) => {
