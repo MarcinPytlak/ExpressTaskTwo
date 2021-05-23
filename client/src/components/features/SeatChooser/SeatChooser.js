@@ -1,28 +1,32 @@
 import React from 'react';
 import { Button, Progress, Alert } from 'reactstrap';
+import io from 'socket.io-client';
 
 import './SeatChooser.scss';
 
+
 class SeatChooser extends React.Component {
-  constructor(){
-    super();
-    setInterval(() => {
-      const { loadSeats} = this.props;
-      loadSeats();
-    }, 1000 * 120);
+  state = {
+    busyChairs: '',
   }
   componentDidMount() {
-    const { loadSeats } = this.props;
+    const { loadSeats , loadSeatsData} = this.props;
     loadSeats();
+
+    this.socket = io('localhost:8000');
+    this.socket.on('updateSeats', (seats) => loadSeatsData(seats));
+    this.socket.on('seatsCounter', (selectedDays) => this.setState({busyChairs : selectedDays}));
+    this.socket.on('firstState', (chairs) =>this.filterDay(chairs));
   }
 
-  componentWillUnmount() {
-    clearInterval();
+  filterDay = (chairs) => {
+    const {chosenDay} = this.props;
+    const chairNumber = chairs.filter(chair => (chair.day === chosenDay)).length;
+    this.setState({busyChairs : chairNumber}); 
   }
 
   isTaken = (seatId) => {
     const { seats, chosenDay } = this.props;
-
     return (seats.some(item => (item.seat === seatId && item.day === chosenDay)));
   }
 
@@ -39,6 +43,7 @@ class SeatChooser extends React.Component {
 
     const { prepareSeat } = this;
     const { requests } = this.props;
+    const { busyChairs} = this.state;
 
     return (
       <div>
@@ -48,6 +53,7 @@ class SeatChooser extends React.Component {
         { (requests['LOAD_SEATS'] && requests['LOAD_SEATS'].success) && <div className="seats">{[...Array(50)].map((x, i) => prepareSeat(i+1) )}</div>}
         { (requests['LOAD_SEATS'] && requests['LOAD_SEATS'].pending) && <Progress animated color="primary" value={50} /> }
         { (requests['LOAD_SEATS'] && requests['LOAD_SEATS'].error) && <Alert color="warning">Couldn't load seats...</Alert> }
+        <h3>Busy chairs: {busyChairs} / {[...Array(50)].map((x, i) => prepareSeat(i+1)).length} total</h3>
       </div>
     )
   };

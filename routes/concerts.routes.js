@@ -1,51 +1,55 @@
 const express = require('express');
 const router = express.Router();
-const db = require('./../db');
+let db = require('../db');
 
 router.route('/concerts').get((req, res) => {
-    let array = db.concerts;
-    res.json(array);
-  });
+    res.json(db.concerts);
+});
 
-  router.route('/concerts/random').get((req, res) => {
-    const randomValue = db.concerts[Math.floor(Math.random() * db.concerts.length)];
-    res.json(randomValue);
-  });
+router.route('/concerts/:id').get((req, res) => {
+    res.json(db.concerts[req.params.id]);
+});
 
-  router.route('/concerts/:id').get((req, res) => {
-    const id = req.params.id;
-    const value = db.concerts.find(x => x.id == id);
-    res.json(value);
-  });
-
-  router.route('/concerts').post((req, res) => {
-    let randomId = db.concerts.length + 1;
-    const { author, text } = req.body;
-    if(author, text){
-         const obj = {
-            id: randomId,
-            author: req.body.author,
-            text: req.body.text,
-        }
-        db.concerts[obj]
+router.route('/concerts').post((req, res) => {
+    const concert = {
+        id: (db.concerts.length + 1),
+        performer: req.body.performer,
+        genre: req.body.genre,
+        price: req.body.price,
+        day: req.body.day,
+        image: req.body.image,
     }
-    res.json({message: "OK!"});
-  });
+    db.concerts.push(concert);
+    return res.json({
+        message: 'ok'
+    });
+});
 
-  router.route('/concerts/:id').put((req, res) => {
-    const id = req.params.id;
-    const value = db.concerts.find(x => x.id == id);
-    const { author, text } = req.body;
-    value.text = text;
-    value.author = author;
-    res.json({message: "OK!"});
-  });
+router.route('/concerts/:id').put((req, res) => {
+    db.concerts.forEach(concert => {
+        if(concert.id == req.params.id) {
+            concert.performer = req.body.performer;
+            concert.genre = req.body.genre;
+            concert.price = req.body.price;
+            concert.day = req.body.day;
+            concert.image = req.body.image;
+        }
+    });
+    return res.json({
+        message: 'ok'
+    });
+});
 
-  router.route('/concerts/:id').delete((req, res) => {
-    const id = req.params.id;
-    const value = db.concerts.find(x => x.id == id);
-    db.concerts.splice(value, 1);
-    res.json({message: "OK!"});
-  });
+router.route('/concerts/:id').delete((req, res) => {
+    db.concerts.forEach(concert => {
+        if(concert.id == req.params.id) {
+            const index = db.concerts.indexOf(concert);
+            db.concerts.splice(index, 1);
+        }
+    });
+    return res.json({
+        message: 'ok'
+    });
+});
 
-  module.exports = router;
+module.exports = router;
