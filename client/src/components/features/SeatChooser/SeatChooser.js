@@ -13,7 +13,7 @@ class SeatChooser extends React.Component {
     const { loadSeats , loadSeatsData} = this.props;
     loadSeats();
 
-    this.socket = io('localhost:8000');
+    this.socket = io((process.env.NODE_ENV === 'production') ? 'localhost:3000' : 'localhost:8000');
     this.socket.on('updateSeats', (seats) => loadSeatsData(seats));
     this.socket.on('seatsCounter', (selectedDays) => this.setState({busyChairs : selectedDays}));
     this.socket.on('firstState', (chairs) =>this.filterDay(chairs));

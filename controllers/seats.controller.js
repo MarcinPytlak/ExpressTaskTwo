@@ -24,18 +24,19 @@ exports.getSeatById = async (req, res) => {
 exports.postSeat = async (req, res) => {
     try {
         const {id, day, seat, client, email} = req.body;
+        const seatTaken = await Seat.findOne({ seat: seat, day:day})
 
-    if(db.seats.some(selectedSeat => (selectedSeat.day == req.body.day && selectedSeat.seat == req.body.seat))) {
+    if(seatTaken) {
         return res.status(409).send('This seat is taken');
     } else {
         const newSeat = new Seat({ id: id, day: day, seat: seat, client: client, email: email});
         await newSeat.save();
-        db.seats.push(seat);
-        req.io.on && req.io.emit('updateSeats', (db.seats));
-        const selectedDays = db.seats.filter(seats => (seats.day == req.body.day)).length;
-        req.io.on && req.io.emit('seatsCounter', selectedDays);
+        req.io.emit('updateSeats', (await Seat.find()));
+        const selectedDays = Seat.findOne({ day : day});
+        req.io.emit('seatsCounter', selectedDays);
         res.json( await Seat.find());
-    }
+        
+    };
     }
     catch(err) {
         res.status(500).json({ message: err });
