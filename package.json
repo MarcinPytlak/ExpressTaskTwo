@@ -20,7 +20,7 @@
     "mongoose": "5.7.1",
     "onchange": "6.1.0",
     "snyk": "1.235.0",
-    "socket.io": "2.2.0"
+    "socket.io": "2.5.0"
   },
   "devDependencies": {
     "es6-promise": "^4.2.8",
